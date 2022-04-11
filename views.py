@@ -16,14 +16,14 @@ def home():
             connector_list.append(config[section]['connector'])
     print(worker_list)
     print(connector_list)
-    return render_template("index.html", name="Simone")
+    return render_template("index.html", name="Mafia")
 
-# http://localhost:127.0.0.1:5000/profile/Lello
+# http://localhost:127.0.0.1:5000/profile/Mafia
 @views.route("/profile/<username>")
 def profile(username):
     return render_template("index.html", name=username)
 
-# http://localhost:127.0.0.1:5000/profilo?name=Lello
+# http://localhost:127.0.0.1:5000/profilo?name=Mafia
 @views.route("/profilo")
 def profilo():
     args = request.args
