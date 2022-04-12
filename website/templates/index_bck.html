@@ -26,11 +26,15 @@
                 </tr>
               </thead>
               <tbody>
+                {% for key, value in work_con_list.items() %}
                   <tr>
-                      <th>Worker1</th>
-                      <td>cdc-reader1</td>
-                      <td><button class="button">Normal</button></td>                
+                      <td>{{key}}</td>
+                      <td>{{value}}</td>
+                      <td>
+                        <button class="button is-info">Config</button>
+                      </td>
                   </tr>
+                {% endfor %}
               </tbody>
         </table>
       </div>
