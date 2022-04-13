@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request
 from sqlalchemy import exc
 import pandas as pd
+import requests
 from . import db
 from .models import Connectors
 from .models import Brokers
@@ -55,12 +56,10 @@ def add_cluster():
             return render_template('home.html')
     return render_template('add_cluster.html')
 
-
 @views.route('/list_connector', methods=['GET', 'POST'])
 def list_connector():
     connector_list = Connectors.query.all()
     return render_template('list_connector.html', connector_list=connector_list)
-
 
 @views.route('/config_connector', methods=['GET', 'POST'])
 def config_connector():
@@ -71,20 +70,20 @@ def config_connector():
     db_connector_name = db_id.name
     db_worker_port = db_id.worker_port
 
-    # DataFrame Magic
+    # DataFrame's Magic
     data_list = [to_dict(item) for item in db_brokers]
     df = pd.DataFrame(data_list)
+
     # Create Lists from Dataframe
     workers = ['broker_hostname']
     broker_plaintext = ['broker_hostname', 'broker_plain_text_port']
     broker_ssl = ['broker_hostname', 'broker_ssl_port']
     broker_plaintext_list = df[workers].values.tolist()
 
-    # Create List of hosts for the CURL
-    test = []
+    # Create Host's list for the CURL
+    curl_hosts = []
     for i in range(0, len(broker_plaintext_list)):
-        test.append(f'http://{broker_plaintext_list[i][0]}:{db_worker_port}')
-
+        curl_hosts.append(f'http://{broker_plaintext_list[i][0]}:{db_worker_port}')
 
     return render_template('config_connector.html')
 
