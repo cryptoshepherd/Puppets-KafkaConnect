@@ -3,11 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %} {% endblock %}</title>
+    <title>Hello Bulma!</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
   </head>
   <body>
-
     <nav class="navbar is-info" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <a class="navbar-item" href="https://bulma.io">
@@ -33,14 +32,14 @@
             </a>
 
             <div class="navbar-dropdown">
-              <a class="navbar-item" href="/add_cluster">
-                Add Cluster
-              </a>
               <a class="navbar-item" href="/add_connector">
                 Add Connector
               </a>
               <a class="navbar-item" href="/list_connector">
                 Connector's List
+              </a>
+              <a class="navbar-item" href="/add_cluster">
+                Add Cluster
               </a>
             </div>
           </div>
@@ -60,6 +59,22 @@
         </div>
       </div>
     </nav>
+
+    <div class="container">
+    <section class="section">
+        <h1 class="title">Connector's Config</h1>
+        <h2 class="subtitle">
+          Configuration Overview
+        </h2>
+    </section>
+    </div>
+    <div class="container">
+
+        <div class="box">
+            I'm in a box.
+          </div>
+
+    </div>
 
   </body>
 </html>
