@@ -37,7 +37,6 @@ MIT
 
 ---
 
-> [amitmerchant.com](https://www.amitmerchant.com) &nbsp;&middot;&nbsp;
 > GitHub [@cryptoshepherd](https://github.com/) &nbsp;&middot;&nbsp;
 > Twitter [@the_lello](https://twitter.com/)
 
