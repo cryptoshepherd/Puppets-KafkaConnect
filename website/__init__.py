@@ -14,6 +14,7 @@ def create_app():
     app.config['SECRET_KEY'] = config.get('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = config.get('SQLALCHEMY_DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
     db.init_app(app)
 
 
