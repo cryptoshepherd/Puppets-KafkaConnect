@@ -4,7 +4,7 @@
   <br>
 </h1>
 
-![kcf](readme/mafia.jpg)
+![kcf](readme/PrH7Zd.png)
 
 <h4 align="center">A Minimal Flask Webapp for Kafka Connect</h4>
 
