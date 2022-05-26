@@ -51,6 +51,14 @@ Double check that broker1,2,3 connect and mysql are up and running
 $ sh setup-mysql.sh
 $ sh setup-topics.sh
 ```
+You can use the following json data to deploy a test source connector by curl command or via rest api client like insomnia or postman.
+the method is PUT, your endpoint will be: http://localhost:8083/connectors/quickstart-jdbc-source/config
+
+```
+{ "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector", "tasks.max": 1, "connection.url": "jdbc:mysql://mysql:3306/connect_test", "connection.user": "root", "connection.password": "test", "mode": "incrementing", "incrementing.column.name": "id", "timestamp.column.name": "modified", "topic.prefix": "quickstart-jdbc-", "poll.interval.ms": 100 }
+```
+
+
 
 in case of troubles with the containers, start from scratch with a clean situation by running the clean.sh script
 
