@@ -1,0 +1,163 @@
+# Create dirs for Kafka / ZK data.
+# mkdir -p /vol1/zk-data
+# mkdir -p /vol2/zk-txn-logs
+# mkdir -p /vol3/kafka-data
+
+# Make sure the user has the read and write permissions.
+# chown -R 1000:1000 /vol1/zk-data
+# chown -R 1000:1000 /vol2/zk-txn-logs
+# chown -R 1000:1000 /vol3/kafka-data
+
+version: '2'
+services:
+  mysql:
+    privileged: true
+    ports:
+      - 3306:3306
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+    image: mysql:8.0
+    volumes:
+      - $PWD/mysql:/var/lib/mysql
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.1.1
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - $PWD/vol1/zk-data:/var/lib/zookeeper/data
+      - $PWD/vol2/zk-txn-logs:/var/lib/zookeeper/log
+  broker1:
+    image: confluentinc/cp-server:7.1.1
+    hostname: broker1
+    container_name: broker1
+    depends_on:
+      - zookeeper
+      - mysql
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      #KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker1:29092,PLAINTEXT_HOST://localhost:9092
+      #KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      #KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      #KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      #KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      #CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:29092
+      #CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      #CONFLUENT_METRICS_ENABLE: 'true'
+      #CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    volumes:
+      - $PWD/vol3/kafka-data:/var/lib/kafka/data
+  broker2:
+    image: confluentinc/cp-server:7.1.1
+    hostname: broker2
+    container_name: broker2
+    depends_on:
+      - zookeeper
+      - broker1
+      - mysql
+    ports:
+      - "9093:9093"
+      - "9201:9201"
+    environment:
+      #KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker2:29093,PLAINTEXT_HOST://localhost:9093
+      #KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      #KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      #KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      #KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      #CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:29092
+      #CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      #CONFLUENT_METRICS_ENABLE: 'true'
+      #CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    volumes:
+      - $PWD/vol4/kafka-data:/var/lib/kafka/data
+  broker3:
+    image: confluentinc/cp-server:7.1.1
+    hostname: broker3
+    container_name: broker3
+    depends_on:
+      - zookeeper
+      - broker1
+      - broker2
+      - mysql
+    ports:
+      - "9094:9094"
+      - "9301:9301"
+    environment:
+      #KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker3:29094,PLAINTEXT_HOST://localhost:9094
+      #KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      #KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      #KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      #KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      #CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:29092
+      #CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      #CONFLUENT_METRICS_ENABLE: 'true'
+      #CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    volumes:
+      - $PWD/vol5/kafka-data:/var/lib/kafka/data
+  connect:
+    image: confluentinc/cp-kafka-connect:latest
+    hostname: connect
+    container_name: connect
+    links:
+      - zookeeper
+      - broker1
+      - broker2
+      - broker3
+      - mysql
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: broker1:29092,broker2:29093,broker3:29094
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect-mysql
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: "quickstart-avro"
+      CONNECT_CONFIG_STORAGE_TOPIC: "quickstart-avro-config"
+      CONNECT_OFFSET_STORAGE_TOPIC: "quickstart-avro-offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "quickstart-avro-status"
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "localhost"
+      #CONNECT_LOG4J_ROOT_LOGLEVEL: DEBUG
+      CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
+      CONNECT_PLUGIN_PATH: "/usr/share/java"
+    volumes:
+      - $PWD/connect-mysql:/usr/share/java/connect-mysql
+
+# [2022-05-10 11:51:10,745] INFO Sample loading finished. Loaded 0 partition metrics samples and 0 broker metric samples in 55 ms. (com.linkedin.kafka.cruisecontrol.monitor.sampling.KafkaSampleStore)
+# 2022-05-10T11:57:00.909231Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
